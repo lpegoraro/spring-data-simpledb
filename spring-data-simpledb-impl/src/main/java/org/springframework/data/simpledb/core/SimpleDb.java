@@ -1,6 +1,7 @@
 package org.springframework.data.simpledb.core;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.simpledb.core.domain.DomainManagementPolicy;
 
 import com.amazonaws.auth.AWSCredentials;
@@ -16,48 +17,25 @@ public class SimpleDb implements InitializingBean {
 
 	private AmazonSimpleDB simpleDbClient;
 
-	private String accessID;
-	private String secretKey;
+	private final String accessID;
+	private final String secretKey;
+	private final String domainPrefix;
 
 	private DomainManagementPolicy domainManagementPolicy = DomainManagementPolicy.UPDATE;
 	private boolean consistentRead = false;
 
 	private int unavailableServiceRetries = 1;
-
-	private String domainPrefix;
-
 	private SimpleDbDomain simpleDbDomain = new SimpleDbDomain();
 
-	public SimpleDb() {
-		// for spring bean injection
-	}
-
-	public SimpleDb(String accessID, String secretKey) {
+	public SimpleDb(String accessID, String secretKey, String domainPrefix) {
 		// to be used in Java configuration when bean is not read from config
 		this.accessID = accessID;
 		this.secretKey = secretKey;
+		this.domainPrefix = domainPrefix;
 	}
 
 	public AmazonSimpleDB getSimpleDbClient() {
 		return simpleDbClient;
-	}
-
-	/**
-	 * Set the Amazon AWS access key ID
-	 * 
-	 * @param accessID
-	 */
-	public void setAccessID(String accessID) {
-		this.accessID = accessID;
-	}
-
-	/**
-	 * Set the Amazon AWS secret key
-	 * 
-	 * @param secretKey
-	 */
-	public void setSecretKey(String secretKey) {
-		this.secretKey = secretKey;
 	}
 
 	/**
@@ -80,16 +58,6 @@ public class SimpleDb implements InitializingBean {
 
 	public String getDomainPrefix() {
 		return this.domainPrefix;
-	}
-
-	/**
-	 * Set the domain prefix. All domains created will be of format <tt>$domainPrefix.$domainName</tt>.<br/>
-	 * If not set, no domain prefix is used and the domain will be of format <tt>$domainName</tt>.
-	 * 
-	 * @param domainPrefix
-	 */
-	public void setDomainPrefix(String domainPrefix) {
-		this.domainPrefix = domainPrefix;
 	}
 
 	public boolean isConsistentRead() {
